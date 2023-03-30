@@ -4,7 +4,7 @@
 const int buttonPin = 2;
 const int ledPin = 3;
 
-const int numLed = 16;
+const int numLed = 12;
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(numLed, ledPin, NEO_GRB);
 
@@ -32,7 +32,7 @@ State current = OFF;
 
 void setup() {
   pinMode(buttonPin, INPUT_PULLUP);
-
+  Serial.begin(9600);
   strip.begin();
   strip.show();
   strip.setBrightness(200);
@@ -43,6 +43,7 @@ void loop() {
 
   // read the state of the switch into a local variable:
   int reading = digitalRead(buttonPin);
+  //Serial.println(reading);
 
   // check to see if you just pressed the button
   // (i.e. the input went from LOW to HIGH), and you've waited long enough
@@ -61,8 +62,11 @@ void loop() {
     // if the button state has changed:
     if (reading != buttonState) {
       buttonState = reading;
-
-      current = nextState(current);
+      if (buttonState == LOW) {
+        current = nextState(current);
+        Serial.println(current);
+      }
+      
     }
   }
 
@@ -76,12 +80,15 @@ void loop() {
   switch (current) {
     case OFF:
       // strip.show with no color set should turn it off
+      for (int i = 0; i < numLed; ++i) {
+        strip.setPixelColor(i, 0);
+      }
       strip.show();
       break;
 
     case SOLID_BLUE:
       for (int i = 0; i < numLed; ++i) {
-        strip.setPixelColor(i, strip.Color(0, 0, 256));
+        strip.setPixelColor(i, strip.Color(0, 0, 200));
       }
       strip.show();
       break;
@@ -96,10 +103,13 @@ void loop() {
           }
           strip.show();
         } else {
-          
+          for (int i = 0; i < numLed; ++i) {
+            strip.setPixelColor(i, 0);
+          }
           strip.show();
         }
         flashOn = !flashOn;
+        Serial.println(flashOn);
       }
       break;
     case SNAKE:
@@ -108,15 +118,15 @@ void loop() {
         nextChange = millis() + cycleTime;
         // changes colors in snake range to green
         for (int i = 0; i < snakeLength; ++i) {
-          strip.setPixelColor((snakeCount + i) % snakeLength, strip.Color(50, 168, 82));
+          strip.setPixelColor((snakeCount + i) % numLed, strip.Color(50, 168, 82));
         }
         // rest of the pixels are set to off
-        for (int j = (snakeCount + snakeLength) % snakeLength; j != snakeCount; j = (j + 1) % snakeLength) {
+        for (int j = (snakeCount + snakeLength) % numLed; j != snakeCount; j = (j + 1) % numLed) {
           strip.setPixelColor(j, 0);
         }
         strip.show();
 
-        snakeCount = (snakeCount + 1) % snakeLength;
+        snakeCount = (snakeCount + 1) % numLed;
       }
       break;
     default:
