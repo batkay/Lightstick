@@ -88,7 +88,7 @@ void loop() {
 
     case SOLID_BLUE:
       for (int i = 0; i < numLed; ++i) {
-        strip.setPixelColor(i, strip.Color(0, 0, 200));
+        strip.setPixelColor(i, strip.Color(200, 0, 0));
       }
       strip.show();
       break;
