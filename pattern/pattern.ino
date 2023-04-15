@@ -16,7 +16,7 @@ unsigned long lastDebounceTime = 0;  // the last time the output pin was toggled
 unsigned long debounceDelay = 50;    // the debounce time; increase if the output flickers
 
 unsigned long cycleTime = 100;
-unsigned long nextChange = 0;
+unsigned long lastChange = millis();
 
 bool flashOn = true;
 int snakeCount = 0;
@@ -94,8 +94,8 @@ void loop() {
       break;
     case FLASH:
     // Delta timings, every few seconds it'll turn the color to purpleish
-      if (millis() > nextChange) {
-        nextChange = millis() + cycleTime;
+      if (millis() - lastChange > cycleTime) {
+        lastChange = millis();
 
         if (flashOn) {
           for (int i = 0; i < numLed; ++i) {
@@ -114,8 +114,8 @@ void loop() {
       break;
     case SNAKE:
       // more delta timings
-      if (millis() > nextChange) {
-        nextChange = millis() + cycleTime;
+      if (millis() - lastChange > cycleTime) {
+        lastChange = millis();
         // changes colors in snake range to green
         for (int i = 0; i < snakeLength; ++i) {
           strip.setPixelColor((snakeCount + i) % numLed, strip.Color(50, 168, 82));
